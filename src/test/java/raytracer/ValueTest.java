@@ -13,4 +13,11 @@ public class ValueTest {
     Value a = new Value(10);
     assertThat(a.v).isEqualTo(10);
   }
+
+  @Test
+  public void addValue() {
+    Value a = new Value(2);
+    Value b = new Value(4);
+    assertThat(a.add(b).v).isEqualTo(6);
+  }
 }
