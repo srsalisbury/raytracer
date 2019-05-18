@@ -20,4 +20,11 @@ public class ValueTest {
     Value b = new Value(4);
     assertThat(a.add(b).v).isEqualTo(6);
   }
+
+  @Test
+  public void isValueEqual() {
+		Value a = new Value(2);
+    Value b = new Value(2);
+  	assertThat(a).isEqualTo(b);
+  }
 }
