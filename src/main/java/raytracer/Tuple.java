@@ -64,6 +64,7 @@ public abstract class Tuple {
   }
 
   public Tuple cross(Tuple t) {
-    return Tuple.vector(y() * t.z() - z() * t.y(), z() * t.x() - x() * t.z(), x() * t.y() - y() * t.x());
+    return Tuple.vector(
+        y() * t.z() - z() * t.y(), z() * t.x() - x() * t.z(), x() * t.y() - y() * t.x());
   }
 }
