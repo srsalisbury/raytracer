@@ -26,7 +26,7 @@ public abstract class Color {
   public Color value(double s) {
     return create(r() * s, g() * s, b() * s);
   }
-  
+
   public Color times(Color c) {
     return create(r() * c.r(), g() * c.g(), b() * c.b());
   }

@@ -19,6 +19,6 @@ public abstract class Projectile {
 
   @Override
   public String toString() {
-  	return String.format("%.2f, %.2f", position().x(), position().y());
+    return String.format("%.2f, %.2f", position().x(), position().y());
   }
 }
