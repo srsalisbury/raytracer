@@ -54,32 +54,6 @@ public class MatrixTest {
 
 /*Feature: Matrices
 
-Scenario: Matrix equality with identical matrices
-  Given the following matrix A:
-      | 1 | 2 | 3 | 4 |
-      | 5 | 6 | 7 | 8 |
-      | 9 | 8 | 7 | 6 |
-      | 5 | 4 | 3 | 2 |
-    And the following matrix B:
-      | 1 | 2 | 3 | 4 |
-      | 5 | 6 | 7 | 8 |
-      | 9 | 8 | 7 | 6 |
-      | 5 | 4 | 3 | 2 |
-  Then A = B
-
-Scenario: Matrix equality with different matrices
-  Given the following matrix A:
-      | 1 | 2 | 3 | 4 |
-      | 5 | 6 | 7 | 8 |
-      | 9 | 8 | 7 | 6 |
-      | 5 | 4 | 3 | 2 |
-    And the following matrix B:
-      | 2 | 3 | 4 | 5 |
-      | 6 | 7 | 8 | 9 |
-      | 8 | 7 | 6 | 5 |
-      | 4 | 3 | 2 | 1 |
-  Then A != B
-
 Scenario: Multiplying two matrices
   Given the following matrix A:
       | 1 | 2 | 3 | 4 |
