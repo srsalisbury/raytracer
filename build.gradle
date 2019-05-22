@@ -22,3 +22,8 @@ task projectilelaunch(type:JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = 'projects.ProjectileTracker'
 }
+
+task projectilecanvas(type:JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'projects.CanvasProjectileTracker'
+}
