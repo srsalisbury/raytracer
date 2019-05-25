@@ -50,26 +50,29 @@ public class MatrixTest {
     assertThat(a).isEqualTo(b);
     assertThat(a).isNotEqualTo(c);
   }
+
+  @Test
+  public void timesMatrixSquare() {
+    Matrix a = new Matrix(4, 4, new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2});
+    Matrix b = new Matrix(4, 4, new double[] {-2, 1, 2, 3, 3, 2, 1, -1, 4, 3, 6, 5, 1, 2, 7, 8});
+    Matrix c =
+        new Matrix(
+            4,
+            4,
+            new double[] {20, 22, 50, 48, 44, 54, 114, 108, 40, 58, 110, 102, 16, 26, 46, 42});
+    assertThat(a.times(b)).isEqualTo(c);
+  }
+
+  @Test
+  public void timesMatrixRectangle() {
+    Matrix a = new Matrix(1, 3, new double[] {1, 1, 1});
+    Matrix b = new Matrix(3, 1, new double[] {1, 1, 1});
+    Matrix c = new Matrix(1, 1, new double[] {3});
+    assertThat(a.times(b)).isEqualTo(c);
+  }
 }
 
 /*Feature: Matrices
-
-Scenario: Multiplying two matrices
-  Given the following matrix A:
-      | 1 | 2 | 3 | 4 |
-      | 5 | 6 | 7 | 8 |
-      | 9 | 8 | 7 | 6 |
-      | 5 | 4 | 3 | 2 |
-    And the following matrix B:
-      | -2 | 1 | 2 |  3 |
-      |  3 | 2 | 1 | -1 |
-      |  4 | 3 | 6 |  5 |
-      |  1 | 2 | 7 |  8 |
-  Then A * B is the following 4x4 matrix:
-      | 20|  22 |  50 |  48 |
-      | 44|  54 | 114 | 108 |
-      | 40|  58 | 110 | 102 |
-      | 16|  26 |  46 |  42 |
 
 Scenario: A matrix multiplied by a tuple
   Given the following matrix A:

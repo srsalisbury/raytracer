@@ -4,39 +4,39 @@ import java.util.Arrays;
 
 public class Matrix {
 
-  private int width;
-  private int height;
+  private int numCols;
+  private int numRows;
   private double[] values;
 
-  public Matrix(int width, int height) {
-    this.width = width;
-    this.height = height;
-    values = new double[width * height];
+  public Matrix(int numRows, int numCols) {
+    this.numCols = numCols;
+    this.numRows = numRows;
+    values = new double[numCols * numRows];
   }
 
-  public Matrix(int width, int height, double[] values) {
-    this.width = width;
-    this.height = height;
-    this.values = new double[width * height];
+  public Matrix(int numRows, int numCols, double[] values) {
+    this.numCols = numCols;
+    this.numRows = numRows;
+    this.values = new double[numCols * numRows];
     for (int i = 0; i < values.length; i++) {
       this.values[i] = values[i];
     }
   }
 
-  public int width() {
-    return width;
+  public int numCols() {
+    return numCols;
   }
 
-  public int height() {
-    return height;
+  public int numRows() {
+    return numRows;
   }
 
   private boolean withinRange(int row, int column) {
-    return row >= 0 && row < height && column >= 0 && column < width;
+    return row >= 0 && row < numRows && column >= 0 && column < numCols;
   }
 
   private int indexOf(int row, int column) {
-    return row * width + column;
+    return row * numCols + column;
   }
 
   public double get(int row, int column) {
@@ -53,6 +53,20 @@ public class Matrix {
     }
   }
 
+  public Matrix times(Matrix m) {
+    Matrix t = new Matrix(numRows(), m.numCols());
+    for (int y = 0; y < numRows(); y++) {
+      for (int x = 0; x < m.numCols(); x++) {
+        double dot = 0.0;
+        for (int i = 0; i < numCols(); i++) {
+          dot += get(y, i) * m.get(i, x);
+        }
+        t.set(y, x, dot);
+      }
+    }
+    return t;
+  }
+
   @Override
   public boolean equals(Object obj) {
     if (obj == null) {
@@ -65,8 +79,20 @@ public class Matrix {
       return false;
     }
     Matrix other = (Matrix) obj;
-    return this.width == other.width
-        && this.height == other.height
+    return this.numCols == other.numCols
+        && this.numRows == other.numRows
         && Arrays.equals(this.values, other.values);
+  }
+
+  @Override
+  public String toString() {
+    StringBuffer out = new StringBuffer();
+    for (int y = 0; y < numCols(); y++) {
+      for (int x = 0; x < numRows(); x++) {
+        out.append(get(y, x));
+        out.append(", ");
+      }
+    }
+    return out.toString();
   }
 }
