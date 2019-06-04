@@ -23,6 +23,10 @@ public class Matrix {
     }
   }
 
+  public static Matrix identity() {
+    return new Matrix(4, 4, new double[] {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
+  }
+
   public int numCols() {
     return numCols;
   }
@@ -53,18 +57,73 @@ public class Matrix {
     }
   }
 
+  private static Matrix fromTuple(Tuple t) {
+    Matrix m = new Matrix(4, 1);
+    m.set(0, 0, t.x());
+    m.set(1, 0, t.y());
+    m.set(2, 0, t.z());
+    m.set(3, 0, t.w());
+    return m;
+  }
+
+  private Tuple toTuple() {
+    Tuple t = Tuple.create(get(0, 0), get(1, 0), get(2, 0), get(3, 0));
+    return t;
+  }
+
   public Matrix times(Matrix m) {
     Matrix t = new Matrix(numRows(), m.numCols());
-    for (int y = 0; y < numRows(); y++) {
-      for (int x = 0; x < m.numCols(); x++) {
+    for (int row = 0; row < numRows(); row++) {
+      for (int col = 0; col < m.numCols(); col++) {
         double dot = 0.0;
         for (int i = 0; i < numCols(); i++) {
-          dot += get(y, i) * m.get(i, x);
+          dot += get(row, i) * m.get(i, col);
         }
-        t.set(y, x, dot);
+        t.set(row, col, dot);
       }
     }
     return t;
+  }
+
+  public Tuple times(Tuple t) {
+    return times(fromTuple(t)).toTuple();
+  }
+
+  public Matrix transpose() {
+    Matrix m = new Matrix(numCols(), numRows());
+    for (int row = 0; row < numRows(); row++) {
+      for (int col = 0; col < m.numCols(); col++) {
+        m.set(row, col, get(col, row));
+      }
+    }
+    return m;
+  }
+
+  public double determinant() {
+    return get(0, 0) * get(1, 1) - get(1, 0) * get(0, 1);
+  }
+
+  public Matrix submatrix(int removedRow, int removedCol) {
+    Matrix m = new Matrix(numRows() - 1, numCols() - 1);
+    for (int row = 0; row < m.numRows(); row++) {
+      for (int col = 0; col < m.numCols(); col++) {
+        int fromRow = row < removedRow ? row : row + 1;
+        int fromCol = col < removedCol ? col : col + 1;
+        m.set(row, col, get(fromRow, fromCol));
+      }
+    }
+    return m;
+  }
+
+  public double minor(int row, int col) {
+    return submatrix(row, col).determinant();
+  }
+
+  public double cofactor(int row, int col) {
+    if((row + col) % 2 == 0) {
+      return minor(row, col);
+    }
+    return -minor(row, col);
   }
 
   @Override
@@ -87,9 +146,9 @@ public class Matrix {
   @Override
   public String toString() {
     StringBuffer out = new StringBuffer();
-    for (int y = 0; y < numCols(); y++) {
-      for (int x = 0; x < numRows(); x++) {
-        out.append(get(y, x));
+    for (int row = 0; row < numCols(); row++) {
+      for (int col = 0; col < numRows(); col++) {
+        out.append(get(row, col));
         out.append(", ");
       }
     }

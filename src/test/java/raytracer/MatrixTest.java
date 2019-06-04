@@ -70,81 +70,75 @@ public class MatrixTest {
     Matrix c = new Matrix(1, 1, new double[] {3});
     assertThat(a.times(b)).isEqualTo(c);
   }
+
+  @Test
+  public void timesMatrixTuple() {
+    Matrix a = new Matrix(4, 4, new double[] {1, 2, 3, 4, 2, 4, 4, 2, 8, 6, 4, 1, 0, 0, 0, 1});
+    Tuple b = Tuple.create(1.0, 2.0, 3.0, 1.0);
+    assertThat(a.times(b)).isEqualTo(Tuple.create(18.0, 24.0, 33.0, 1.0));
+  }
+
+  @Test
+  public void timesMatrixIdentity() {
+    Matrix a = new Matrix(4, 4, new double[] {1, 2, 3, 4, 5, 6, 7, 8, 9, 8, 7, 6, 5, 4, 3, 2});
+    assertThat(a.times(Matrix.identity())).isEqualTo(a);
+  }
+
+  @Test
+  public void timesTupleIdentity() {
+    Tuple a = Tuple.create(1.0, 2.0, 3.0, 4.0);
+    assertThat(Matrix.identity().times(a)).isEqualTo(a);
+  }
+
+  @Test
+  public void transposeMatrix() {
+    Matrix a = new Matrix(4, 4, new double[] {0, 9, 3, 0, 9, 8, 0, 8, 1, 8, 5, 3, 0, 0, 5, 8});
+    Matrix b = new Matrix(4, 4, new double[] {0, 9, 1, 0, 9, 8, 8, 0, 3, 0, 5, 5, 0, 8, 3, 8});
+    assertThat(a.transpose()).isEqualTo(b);
+  }
+
+  @Test
+  public void transposeIdentity() {
+    assertThat(Matrix.identity().transpose()).isEqualTo(Matrix.identity());
+  }
+
+  @Test
+  public void determinantTwoByTwo() {
+    Matrix a = new Matrix(2, 2, new double[] {1, 5, -3, 2});
+    assertThat(a.determinant()).isEqualTo(17.0);
+  }
+
+  @Test
+  public void submatrixThreeByThree() {
+    Matrix a = new Matrix(3, 3, new double[] {1, 5, 0, -3, 2, 7, 0, 6, -3});
+    Matrix b = new Matrix(2, 2, new double[] {-3, 2, 0, 6});
+    assertThat(a.submatrix(0, 2)).isEqualTo(b);
+  }
+
+  @Test
+  public void submatrixFourByFour() {
+    Matrix a = new Matrix(4, 4, new double[] {-6, 1, 1, 6, -8, 5, 8, 6, -1, 0, 8, 2, -7, 1, -1, 1});
+    Matrix b = new Matrix(3, 3, new double[] {-6, 1, 6, -8, 8, 6, -7, -1, 1});
+    assertThat(a.submatrix(2, 1)).isEqualTo(b);
+  }
+
+  @Test
+  public void minorThreeByThree() {
+    Matrix a = new Matrix(3, 3, new double[] {3, 5, 0, 2, -1, -7, 6, -1, 5});
+    assertThat(a.minor(1, 0)).isEqualTo(25.0);
+  }
+
+  @Test
+  public void cofactorThreeByThree() {
+    Matrix a = new Matrix(3, 3, new double[] {3, 5, 0, 2, -1, -7, 6, -1, 5});
+    assertThat(a.minor(0, 0)).isEqualTo(-12.0);
+    assertThat(a.cofactor(0, 0)).isEqualTo(-12.0);
+    assertThat(a.minor(1, 0)).isEqualTo(25.0);
+    assertThat(a.cofactor(1, 0)).isEqualTo(-25.0);
+  }
 }
 
 /*Feature: Matrices
-
-Scenario: A matrix multiplied by a tuple
-  Given the following matrix A:
-      | 1 | 2 | 3 | 4 |
-      | 2 | 4 | 4 | 2 |
-      | 8 | 6 | 4 | 1 |
-      | 0 | 0 | 0 | 1 |
-    And b ← tuple(1, 2, 3, 1)
-  Then A * b = tuple(18, 24, 33, 1)
-
-Scenario: Multiplying a matrix by the identity matrix
-  Given the following matrix A:
-    | 0 | 1 |  2 |  4 |
-    | 1 | 2 |  4 |  8 |
-    | 2 | 4 |  8 | 16 |
-    | 4 | 8 | 16 | 32 |
-  Then A * identity_matrix = A
-
-Scenario: Multiplying the identity matrix by a tuple
-  Given a ← tuple(1, 2, 3, 4)
-  Then identity_matrix * a = a
-
-Scenario: Transposing a matrix
-  Given the following matrix A:
-    | 0 | 9 | 3 | 0 |
-    | 9 | 8 | 0 | 8 |
-    | 1 | 8 | 5 | 3 |
-    | 0 | 0 | 5 | 8 |
-  Then transpose(A) is the following matrix:
-    | 0 | 9 | 1 | 0 |
-    | 9 | 8 | 8 | 0 |
-    | 3 | 0 | 5 | 5 |
-    | 0 | 8 | 3 | 8 |
-
-Scenario: Transposing the identity matrix
-  Given A ← transpose(identity_matrix)
-  Then A = identity_matrix
-
-Scenario: Calculating the determinant of a 2x2 matrix
-  Given the following 2x2 matrix A:
-    |  1 | 5 |
-    | -3 | 2 |
-  Then determinant(A) = 17
-
-Scenario: A submatrix of a 3x3 matrix is a 2x2 matrix
-  Given the following 3x3 matrix A:
-    |  1 | 5 |  0 |
-    | -3 | 2 |  7 |
-    |  0 | 6 | -3 |
-  Then submatrix(A, 0, 2) is the following 2x2 matrix:
-    | -3 | 2 |
-    |  0 | 6 |
-
-Scenario: A submatrix of a 4x4 matrix is a 3x3 matrix
-  Given the following 4x4 matrix A:
-    | -6 |  1 |  1 |  6 |
-    | -8 |  5 |  8 |  6 |
-    | -1 |  0 |  8 |  2 |
-    | -7 |  1 | -1 |  1 |
-  Then submatrix(A, 2, 1) is the following 3x3 matrix:
-    | -6 |  1 | 6 |
-    | -8 |  8 | 6 |
-    | -7 | -1 | 1 |
-
-Scenario: Calculating a minor of a 3x3 matrix
-  Given the following 3x3 matrix A:
-      |  3 |  5 |  0 |
-      |  2 | -1 | -7 |
-      |  6 | -1 |  5 |
-    And B ← submatrix(A, 1, 0)
-  Then determinant(B) = 25
-    And minor(A, 1, 0) = 25
 
 Scenario: Calculating a cofactor of a 3x3 matrix
   Given the following 3x3 matrix A:
