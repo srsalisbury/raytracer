@@ -100,6 +100,35 @@ public class Matrix {
   }
 
   public double determinant() {
+    if (numRows != numCols) {
+      throw new IllegalArgumentException("Determinant requires square matrix to work");
+    }
+    if (numRows == 2) {
+      return determinantTwoByTwo();
+    }
+    double d = 0.0;
+    for (int col = 0; col < numCols; col++) {
+      d += get(0, col) * cofactor(0, col);
+      System.out.println(d);
+    }
+    return d;
+  }
+
+  public Matrix invert() {
+    if (!isInvertible()) {
+      throw new IllegalStateException("Matrix is not invertible");
+    }
+    Matrix m = new Matrix(numRows, numCols);
+    double d = determinant();
+    for (int row = 0; row < numRows(); row++) {
+      for (int col = 0; col < numCols(); col++) {
+        m.set(row, col, cofactor(col, row) / d);
+      }
+    }
+    return m;
+  }
+
+  private double determinantTwoByTwo() {
     return get(0, 0) * get(1, 1) - get(1, 0) * get(0, 1);
   }
 
@@ -120,10 +149,14 @@ public class Matrix {
   }
 
   public double cofactor(int row, int col) {
-    if((row + col) % 2 == 0) {
+    if ((row + col) % 2 == 0) {
       return minor(row, col);
     }
     return -minor(row, col);
+  }
+
+  public boolean isInvertible() {
+    return determinant() != 0;
   }
 
   @Override
