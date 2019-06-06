@@ -2,6 +2,7 @@ package raytracer;
 
 import static com.google.common.truth.Truth.assertThat;
 import static raytracer.MatrixSubject.assertThat;
+import static raytracer.TupleSubject.assertThat;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -180,4 +181,172 @@ public class MatrixTest {
         new Matrix(4, 4, new double[] {3, -9, 7, 3, 3, -8, 2, -9, -4, 4, 4, 1, -6, 5, -1, 1});
     assertThat(a.times(a.invert())).isApproximatelyEqualTo(Matrix.identity());
   }
+
+  @Test
+  public void translatePoint() {
+    Tuple p = Tuple.point(-3, 4, 5);
+    Matrix t = Matrix.translate(5, -3, 2);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(2, 1, 7));
+  }
+
+  @Test
+  public void inverseTranslatePoint() {
+    Matrix t = Matrix.translate(5, -3, 2);
+    Matrix i = t.invert();
+    Tuple p = Tuple.point(-3, 4, 5);
+    assertThat(i.times(p)).isEqualTo(Tuple.point(-8, 7, 3));
+  }
+
+  @Test
+  public void translateVector() {
+    Matrix t = Matrix.translate(5, -3, 2);
+    Tuple v = Tuple.vector(-3, 4, 5);
+    assertThat(t.times(v)).isEqualTo(v);
+  }
+
+  @Test
+  public void scalePoint() {
+    Matrix t = Matrix.scale(2, 3, 4);
+    Tuple p = Tuple.point(-4, 6, 8);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(-8, 18, 32));
+  }
+
+  @Test
+  public void scaleVector() {
+    Matrix t = Matrix.scale(2, 3, 4);
+    Tuple v = Tuple.vector(-4, 6, 8);
+    assertThat(t.times(v)).isEqualTo(Tuple.vector(-8, 18, 32));
+  }
+
+  @Test
+  public void inverseScaleVector() {
+    Matrix t = Matrix.scale(2, 3, 4);
+    Matrix i = t.invert();
+    Tuple v = Tuple.vector(-4, 6, 8);
+    assertThat(i.times(v)).isEqualTo(Tuple.vector(-2, 2, 2));
+  }
+
+  @Test
+  public void reflectPoint() {
+    Matrix t = Matrix.scale(-1, 1, 1);
+    Tuple p = Tuple.point(2, 3, 4);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(-2, 3, 4));
+  }
+
+  @Test
+  public void rotateX() {
+    Matrix half_quarter = Matrix.rotateX(Math.PI / 4);
+    Matrix full_quarter = Matrix.rotateX(Math.PI / 2);
+    Tuple p = Tuple.point(0, 1, 0);
+    assertThat(half_quarter.times(p))
+        .isApproximatelyEqualTo(Tuple.point(0, Math.sqrt(2) / 2, Math.sqrt(2) / 2));
+    assertThat(full_quarter.times(p)).isApproximatelyEqualTo(Tuple.point(0, 0, 1));
+  }
 }
+/*Feature: Matrix Transformations
+
+Scenario: The inverse of an x-rotation rotates in the opposite direction
+  Given p ← point(0, 1, 0)
+    And half_quarter ← rotation_x(π / 4)
+    And inv ← inverse(half_quarter)
+  Then inv * p = point(0, √2/2, -√2/2)
+
+Scenario: Rotating a point around the y axis
+  Given p ← point(0, 0, 1)
+    And half_quarter ← rotation_y(π / 4)
+    And full_quarter ← rotation_y(π / 2)
+  Then half_quarter * p = point(√2/2, 0, √2/2)
+    And full_quarter * p = point(1, 0, 0)
+
+Scenario: Rotating a point around the z axis
+  Given p ← point(0, 1, 0)
+    And half_quarter ← rotation_z(π / 4)
+    And full_quarter ← rotation_z(π / 2)
+  Then half_quarter * p = point(-√2/2, √2/2, 0)
+    And full_quarter * p = point(-1, 0, 0)
+
+Scenario: A shearing transformation moves x in proportion to y
+  Given transform ← shearing(1, 0, 0, 0, 0, 0)
+    And p ← point(2, 3, 4)
+  Then transform * p = point(5, 3, 4)
+
+Scenario: A shearing transformation moves x in proportion to z
+  Given transform ← shearing(0, 1, 0, 0, 0, 0)
+    And p ← point(2, 3, 4)
+  Then transform * p = point(6, 3, 4)
+
+Scenario: A shearing transformation moves y in proportion to x
+  Given transform ← shearing(0, 0, 1, 0, 0, 0)
+    And p ← point(2, 3, 4)
+  Then transform * p = point(2, 5, 4)
+
+Scenario: A shearing transformation moves y in proportion to z
+  Given transform ← shearing(0, 0, 0, 1, 0, 0)
+    And p ← point(2, 3, 4)
+  Then transform * p = point(2, 7, 4)
+
+Scenario: A shearing transformation moves z in proportion to x
+  Given transform ← shearing(0, 0, 0, 0, 1, 0)
+    And p ← point(2, 3, 4)
+  Then transform * p = point(2, 3, 6)
+
+Scenario: A shearing transformation moves z in proportion to y
+  Given transform ← shearing(0, 0, 0, 0, 0, 1)
+    And p ← point(2, 3, 4)
+  Then transform * p = point(2, 3, 7)
+
+Scenario: Individual transformations are applied in sequence
+  Given p ← point(1, 0, 1)
+    And A ← rotation_x(π / 2)
+    And B ← scaling(5, 5, 5)
+    And C ← translation(10, 5, 7)
+  # apply rotation first
+  When p2 ← A * p
+  Then p2 = point(1, -1, 0)
+  # then apply scaling
+  When p3 ← B * p2
+  Then p3 = point(5, -5, 0)
+  # then apply translation
+  When p4 ← C * p3
+  Then p4 = point(15, 0, 7)
+
+Scenario: Chained transformations must be applied in reverse order
+  Given p ← point(1, 0, 1)
+    And A ← rotation_x(π / 2)
+    And B ← scaling(5, 5, 5)
+    And C ← translation(10, 5, 7)
+  When T ← C * B * A
+  Then T * p = point(15, 0, 7)
+
+Scenario: The transformation matrix for the default orientation
+  Given from ← point(0, 0, 0)
+    And to ← point(0, 0, -1)
+    And up ← vector(0, 1, 0)
+  When t ← view_transform(from, to, up)
+  Then t = identity_matrix
+
+Scenario: A view transformation matrix looking in positive z direction
+  Given from ← point(0, 0, 0)
+    And to ← point(0, 0, 1)
+    And up ← vector(0, 1, 0)
+  When t ← view_transform(from, to, up)
+  Then t = scaling(-1, 1, -1)
+
+Scenario: The view transformation moves the world
+  Given from ← point(0, 0, 8)
+    And to ← point(0, 0, 0)
+    And up ← vector(0, 1, 0)
+  When t ← view_transform(from, to, up)
+  Then t = translation(0, 0, -8)
+
+Scenario: An arbitrary view transformation
+  Given from ← point(1, 3, 2)
+    And to ← point(4, -2, 8)
+    And up ← vector(1, 1, 0)
+  When t ← view_transform(from, to, up)
+  Then t is the following 4x4 matrix:
+      | -0.50709 | 0.50709 |  0.67612 | -2.36643 |
+      |  0.76772 | 0.60609 |  0.12122 | -2.82843 |
+      | -0.35857 | 0.59761 | -0.71714 |  0.00000 |
+      |  0.00000 | 0.00000 |  0.00000 |  1.00000 |
+*/

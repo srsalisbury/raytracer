@@ -27,6 +27,49 @@ public class Matrix {
     return new Matrix(4, 4, new double[] {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1});
   }
 
+  public static Matrix translate(double x, double y, double z) {
+    Matrix m = identity();
+    m.set(0, 3, x);
+    m.set(1, 3, y);
+    m.set(2, 3, z);
+    return m;
+  }
+
+  public static Matrix scale(double x, double y, double z) {
+    Matrix m = identity();
+    m.set(0, 0, x);
+    m.set(1, 1, y);
+    m.set(2, 2, z);
+    return m;
+  }
+
+  public static Matrix rotateX(double angle) {
+    Matrix m = identity();
+    m.set(1, 1, Math.cos(angle));
+    m.set(1, 2, -Math.sin(angle));
+    m.set(2, 1, Math.sin(angle));
+    m.set(2, 2, Math.cos(angle));
+    return m;
+  }
+
+  public static Matrix rotateY(double angle) {
+    Matrix m = identity();
+    m.set(0, 0, Math.cos(angle));
+    m.set(2, 0, -Math.sin(angle));
+    m.set(0, 2, Math.sin(angle));
+    m.set(2, 2, Math.cos(angle));
+    return m;
+  }
+
+  public static Matrix rotateZ(double angle) {
+    Matrix m = identity();
+    m.set(0, 0, Math.cos(angle));
+    m.set(0, 1, -Math.sin(angle));
+    m.set(1, 0, Math.sin(angle));
+    m.set(1, 1, Math.cos(angle));
+    return m;
+  }
+
   public int numCols() {
     return numCols;
   }
