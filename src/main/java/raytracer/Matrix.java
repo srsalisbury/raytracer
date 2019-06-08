@@ -70,6 +70,17 @@ public class Matrix {
     return m;
   }
 
+  public static Matrix shear(double xy, double xz, double yx, double yz, double zx, double zy) {
+    Matrix m = identity();
+    m.set(0, 1, xy);
+    m.set(0, 2, xz);
+    m.set(1, 0, yx);
+    m.set(1, 2, yz);
+    m.set(2, 0, zx);
+    m.set(2, 1, zy);
+    return m;
+  }
+
   public int numCols() {
     return numCols;
   }

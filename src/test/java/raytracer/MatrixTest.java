@@ -242,81 +242,101 @@ public class MatrixTest {
         .isApproximatelyEqualTo(Tuple.point(0, Math.sqrt(2) / 2, Math.sqrt(2) / 2));
     assertThat(full_quarter.times(p)).isApproximatelyEqualTo(Tuple.point(0, 0, 1));
   }
+
+  @Test
+  public void inverseRotateX() {
+    Matrix half_quarter = Matrix.rotateX(Math.PI / 4);
+    Matrix i = half_quarter.invert();
+    Tuple p = Tuple.point(0, 1, 0);
+    assertThat(i.times(p))
+        .isApproximatelyEqualTo(Tuple.point(0, Math.sqrt(2) / 2, -Math.sqrt(2) / 2));
+  }
+
+  @Test
+  public void rotateY() {
+    Matrix half_quarter = Matrix.rotateY(Math.PI / 4);
+    Matrix full_quarter = Matrix.rotateY(Math.PI / 2);
+    Tuple p = Tuple.point(0, 0, 1);
+    assertThat(half_quarter.times(p))
+        .isApproximatelyEqualTo(Tuple.point(Math.sqrt(2) / 2, 0, Math.sqrt(2) / 2));
+    assertThat(full_quarter.times(p)).isApproximatelyEqualTo(Tuple.point(1, 0, 0));
+  }
+
+  @Test
+  public void rotateZ() {
+    Matrix half_quarter = Matrix.rotateZ(Math.PI / 4);
+    Matrix full_quarter = Matrix.rotateZ(Math.PI / 2);
+    Tuple p = Tuple.point(0, 1, 0);
+    assertThat(half_quarter.times(p))
+        .isApproximatelyEqualTo(Tuple.point(-Math.sqrt(2) / 2, Math.sqrt(2) / 2, 0));
+    assertThat(full_quarter.times(p)).isApproximatelyEqualTo(Tuple.point(-1, 0, 0));
+  }
+
+  @Test
+  public void shearXY() {
+    Matrix t = Matrix.shear(1, 0, 0, 0, 0, 0);
+    Tuple p = Tuple.point(2, 3, 4);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(5, 3, 4));
+  }
+
+  @Test
+  public void shearXZ() {
+    Matrix t = Matrix.shear(0, 1, 0, 0, 0, 0);
+    Tuple p = Tuple.point(2, 3, 4);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(6, 3, 4));
+  }
+
+  @Test
+  public void shearYX() {
+    Matrix t = Matrix.shear(0, 0, 1, 0, 0, 0);
+    Tuple p = Tuple.point(2, 3, 4);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(2, 5, 4));
+  }
+
+  @Test
+  public void shearYZ() {
+    Matrix t = Matrix.shear(0, 0, 0, 1, 0, 0);
+    Tuple p = Tuple.point(2, 3, 4);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(2, 7, 4));
+  }
+
+  @Test
+  public void shearZX() {
+    Matrix t = Matrix.shear(0, 0, 0, 0, 1, 0);
+    Tuple p = Tuple.point(2, 3, 4);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(2, 3, 6));
+  }
+
+  @Test
+  public void shearZY() {
+    Matrix t = Matrix.shear(0, 0, 0, 0, 0, 1);
+    Tuple p = Tuple.point(2, 3, 4);
+    assertThat(t.times(p)).isEqualTo(Tuple.point(2, 3, 7));
+  }
+
+  @Test
+  public void sequenceTransform() {
+    Tuple p = Tuple.point(1, 0, 1);
+    Matrix a = Matrix.rotateX(Math.PI / 2);
+    Matrix b = Matrix.scale(5, 5, 5);
+    Matrix c = Matrix.translate(10, 5, 7);
+    Tuple p2 = a.times(p);
+    Tuple p3 = b.times(p2);
+    Tuple p4 = c.times(p3);
+    assertThat(p4).isEqualTo(Tuple.point(15, 0, 7));
+  }
+
+  @Test
+  public void chainTransform() {
+    Tuple p = Tuple.point(1, 0, 1);
+    Matrix a = Matrix.rotateX(Math.PI / 2);
+    Matrix b = Matrix.scale(5, 5, 5);
+    Matrix c = Matrix.translate(10, 5, 7);
+    Matrix t = c.times(b.times(a));
+    assertThat(t.times(p)).isEqualTo(Tuple.point(15, 0, 7));
+  }
 }
 /*Feature: Matrix Transformations
-
-Scenario: The inverse of an x-rotation rotates in the opposite direction
-  Given p ← point(0, 1, 0)
-    And half_quarter ← rotation_x(π / 4)
-    And inv ← inverse(half_quarter)
-  Then inv * p = point(0, √2/2, -√2/2)
-
-Scenario: Rotating a point around the y axis
-  Given p ← point(0, 0, 1)
-    And half_quarter ← rotation_y(π / 4)
-    And full_quarter ← rotation_y(π / 2)
-  Then half_quarter * p = point(√2/2, 0, √2/2)
-    And full_quarter * p = point(1, 0, 0)
-
-Scenario: Rotating a point around the z axis
-  Given p ← point(0, 1, 0)
-    And half_quarter ← rotation_z(π / 4)
-    And full_quarter ← rotation_z(π / 2)
-  Then half_quarter * p = point(-√2/2, √2/2, 0)
-    And full_quarter * p = point(-1, 0, 0)
-
-Scenario: A shearing transformation moves x in proportion to y
-  Given transform ← shearing(1, 0, 0, 0, 0, 0)
-    And p ← point(2, 3, 4)
-  Then transform * p = point(5, 3, 4)
-
-Scenario: A shearing transformation moves x in proportion to z
-  Given transform ← shearing(0, 1, 0, 0, 0, 0)
-    And p ← point(2, 3, 4)
-  Then transform * p = point(6, 3, 4)
-
-Scenario: A shearing transformation moves y in proportion to x
-  Given transform ← shearing(0, 0, 1, 0, 0, 0)
-    And p ← point(2, 3, 4)
-  Then transform * p = point(2, 5, 4)
-
-Scenario: A shearing transformation moves y in proportion to z
-  Given transform ← shearing(0, 0, 0, 1, 0, 0)
-    And p ← point(2, 3, 4)
-  Then transform * p = point(2, 7, 4)
-
-Scenario: A shearing transformation moves z in proportion to x
-  Given transform ← shearing(0, 0, 0, 0, 1, 0)
-    And p ← point(2, 3, 4)
-  Then transform * p = point(2, 3, 6)
-
-Scenario: A shearing transformation moves z in proportion to y
-  Given transform ← shearing(0, 0, 0, 0, 0, 1)
-    And p ← point(2, 3, 4)
-  Then transform * p = point(2, 3, 7)
-
-Scenario: Individual transformations are applied in sequence
-  Given p ← point(1, 0, 1)
-    And A ← rotation_x(π / 2)
-    And B ← scaling(5, 5, 5)
-    And C ← translation(10, 5, 7)
-  # apply rotation first
-  When p2 ← A * p
-  Then p2 = point(1, -1, 0)
-  # then apply scaling
-  When p3 ← B * p2
-  Then p3 = point(5, -5, 0)
-  # then apply translation
-  When p4 ← C * p3
-  Then p4 = point(15, 0, 7)
-
-Scenario: Chained transformations must be applied in reverse order
-  Given p ← point(1, 0, 1)
-    And A ← rotation_x(π / 2)
-    And B ← scaling(5, 5, 5)
-    And C ← translation(10, 5, 7)
-  When T ← C * B * A
-  Then T * p = point(15, 0, 7)
 
 Scenario: The transformation matrix for the default orientation
   Given from ← point(0, 0, 0)

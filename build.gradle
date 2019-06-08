@@ -27,3 +27,8 @@ task projectilecanvas(type:JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = 'projects.CanvasProjectileTracker'
 }
+
+task drawclock(type:JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'projects.Clock'
+}
