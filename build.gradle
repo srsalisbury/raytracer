@@ -32,3 +32,8 @@ task drawclock(type:JavaExec) {
   classpath = sourceSets.main.runtimeClasspath
   main = 'projects.Clock'
 }
+
+task draw2dsphere(type:JavaExec) {
+  classpath = sourceSets.main.runtimeClasspath
+  main = 'projects.TwoDSphere'
+}

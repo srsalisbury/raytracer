@@ -163,7 +163,6 @@ public class Matrix {
     double d = 0.0;
     for (int col = 0; col < numCols; col++) {
       d += get(0, col) * cofactor(0, col);
-      System.out.println(d);
     }
     return d;
   }

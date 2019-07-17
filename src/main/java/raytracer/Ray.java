@@ -1,28 +1,23 @@
 package raytracer;
 
-public class Ray {
+import com.google.auto.value.AutoValue;
 
-  private Tuple origin;
-  private Tuple direction;
+@AutoValue
+public abstract class Ray {
 
-  public Ray(Tuple origin, Tuple direction) {
-    this.origin = origin;
-    this.direction = direction;
+  public static Ray create(Tuple origin, Tuple direction) {
+    return new AutoValue_Ray(origin, direction);
   }
 
-  public Tuple origin() {
-    return origin;
-  }
+  public abstract Tuple origin();
 
-  public Tuple direction() {
-    return direction;
-  }
+  public abstract Tuple direction();
 
   public Tuple position(double t) {
-    return direction.times(t).add(origin);
+    return direction().times(t).add(origin());
   }
 
   public Ray transform(Matrix m) {
-    return new Ray(m.times(origin), m.times(direction));
+    return Ray.create(m.times(origin()), m.times(direction()));
   }
 }
